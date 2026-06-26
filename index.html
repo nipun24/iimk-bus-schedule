@@ -105,6 +105,22 @@
   .viewtoggle button.on{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.18)}
   .reset{border:0;background:transparent;color:var(--ink-faint);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
+  /* ---- subscribe card ---- */
+  .subcard{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:13px 14px;margin-bottom:16px;flex-wrap:wrap}
+  .sub-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .sub-title{font-weight:600;font-size:14px}
+  .sub-sub{font-size:11.5px;color:var(--ink-faint)}
+  .sub-actions{display:flex;gap:7px;align-items:center}
+  .sub-go{appearance:none;text-decoration:none;border:0;cursor:pointer;
+    background:var(--ink);color:var(--bg);font-family:var(--sans);font-weight:600;font-size:13px;
+    padding:9px 16px;border-radius:9px;white-space:nowrap}
+  .sub-copy{appearance:none;cursor:pointer;background:var(--panel-2);color:var(--ink-dim);
+    border:1px solid var(--line);font-family:var(--sans);font-weight:600;font-size:13px;
+    padding:9px 13px;border-radius:9px;white-space:nowrap;transition:.15s}
+  .sub-copy.done{color:var(--staff);border-color:var(--staff)}
+
   /* ---- list ---- */
   .meta{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 10px;color:var(--ink-faint);font-size:12px;font-weight:500}
   .list{display:flex;flex-direction:column;gap:9px}
@@ -182,6 +198,17 @@
         <button data-v="next" class="on">Next</button>
       </div>
       <button class="reset" id="reset">Clear filters</button>
+    </div>
+  </section>
+
+  <section class="subcard">
+    <div class="sub-info">
+      <span class="sub-title">📅 Add to your calendar</span>
+      <span class="sub-sub" id="subDesc">Next 2 buses, auto-updating</span>
+    </div>
+    <div class="sub-actions">
+      <a class="sub-go" id="subGo" href="#">Subscribe</a>
+      <button class="sub-copy" id="subCopy" type="button">Copy link</button>
     </div>
   </section>
 
@@ -324,6 +351,7 @@ function untilText(delta){
 }
 
 function render(){
+  updateSubscribe();
   const now=nowMin();
   const rows=TRIPS.filter(matches).sort((a,b)=>a.min-b.min);
 
@@ -401,6 +429,47 @@ function renderHero(up,now){
   body.innerHTML=`<div class="count">${ct}<span class="dep">· ${fmt12(up.t)}</span></div>
     <div class="route">${routeHTML(up)}</div>${up.note?`<div class="note">${up.note}</div>`:''}`;
 }
+
+/* ---------------- subscribe / calendar feed ---------------- */
+const ICS_PATH="/shuttle.ics"; // Cloudflare Pages Function route
+function subParams(){
+  const p=new URLSearchParams();
+  if(state.svc!=="all")p.set("svc",state.svc);
+  if(state.from)p.set("from",state.from);
+  if(state.to)p.set("to",state.to);
+  const q=p.toString();
+  return q?("?"+q):"";
+}
+function subUrls(){
+  const host=location.host||"your-domain";
+  const qs=subParams();
+  return {
+    webcal:"webcal://"+host+ICS_PATH+qs,
+    https:location.protocol+"//"+host+ICS_PATH+qs
+  };
+}
+function updateSubscribe(){
+  const {webcal}=subUrls();
+  const go=document.getElementById("subGo");
+  go.href=webcal;
+  const bits=[];
+  if(state.svc!=="all")bits.push(state.svc);
+  if(state.from)bits.push("from "+state.from);
+  if(state.to)bits.push("to "+state.to);
+  document.getElementById("subDesc").textContent=
+    "Next 2 buses, auto-updating"+(bits.length?" · "+bits.join(" · "):"");
+}
+document.getElementById("subCopy").addEventListener("click",async ()=>{
+  const {webcal}=subUrls();
+  const btn=document.getElementById("subCopy");
+  try{
+    await navigator.clipboard.writeText(webcal);
+    btn.textContent="Copied!";btn.classList.add("done");
+    setTimeout(()=>{btn.textContent="Copy link";btn.classList.remove("done");},1600);
+  }catch(e){
+    window.prompt("Copy this calendar link:",webcal);
+  }
+});
 
 /* ---------------- clock ---------------- */
 function tickClock(){
