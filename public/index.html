@@ -1,519 +1,1158 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>IIMK Shuttle — Bus Departures</title>
-<meta name="description" content="Live student and staff shuttle departures for the IIM Kozhikode campus." />
-<meta name="theme-color" content="#101216" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
-<style>
-  :root{
-    --bg:#0e1014;
-    --panel:#171a20;
-    --panel-2:#1d212a;
-    --line:#272c37;
-    --line-soft:#20242d;
-    --ink:#eef1f6;
-    --ink-dim:#9aa3b2;
-    --ink-faint:#697283;
-    --student:#f0a23c;      /* warm amber line */
-    --student-soft:#3a2a14;
-    --staff:#22b0a6;        /* cool teal line */
-    --staff-soft:#0f2b2a;
-    --now:#ff5d73;
-    --radius:16px;
-    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-    --sans:"Space Grotesk",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-  }
-  @media (prefers-color-scheme: light){
-    :root{
-      --bg:#f3f4f7; --panel:#ffffff; --panel-2:#f6f7fa;
-      --line:#e4e7ee; --line-soft:#eceef3;
-      --ink:#161922; --ink-dim:#5a6473; --ink-faint:#8b95a6;
-      --student-soft:#fbeed8; --staff-soft:#d8f1ee;
-    }
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0}
-  body{
-    background:var(--bg); color:var(--ink);
-    font-family:var(--sans);
-    -webkit-font-smoothing:antialiased;
-    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-    line-height:1.4;
-  }
-  .wrap{max-width:560px;margin:0 auto;padding:18px 16px 64px}
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>IIMK Shuttle — Bus Departures</title>
+    <meta http-equiv="refresh" content="10" />
+    <meta
+      name="description"
+      content="Live student and staff shuttle departures for the IIM Kozhikode campus."
+    />
+    <meta name="theme-color" content="#101216" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0e1014;
+        --panel: #171a20;
+        --panel-2: #1d212a;
+        --line: #272c37;
+        --line-soft: #20242d;
+        --ink: #eef1f6;
+        --ink-dim: #9aa3b2;
+        --ink-faint: #697283;
+        --student: #f0a23c; /* warm amber line */
+        --student-soft: #3a2a14;
+        --staff: #22b0a6; /* cool teal line */
+        --staff-soft: #0f2b2a;
+        --now: #ff5d73;
+        --radius: 16px;
+        --mono:
+          "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+        --sans:
+          "Space Grotesk", system-ui, -apple-system, Segoe UI, Roboto,
+          sans-serif;
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #f3f4f7;
+          --panel: #ffffff;
+          --panel-2: #f6f7fa;
+          --line: #e4e7ee;
+          --line-soft: #eceef3;
+          --ink: #161922;
+          --ink-dim: #5a6473;
+          --ink-faint: #8b95a6;
+          --student-soft: #fbeed8;
+          --staff-soft: #d8f1ee;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right)
+          env(safe-area-inset-bottom) env(safe-area-inset-left);
+        line-height: 1.4;
+      }
+      .wrap {
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 18px 16px 64px;
+      }
 
-  /* ---- top bar ---- */
-  .bar{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:18px}
-  .brand{font-weight:700;font-size:19px;letter-spacing:-.02em}
-  .brand small{display:block;font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-top:2px}
-  .clock{font-family:var(--mono);font-weight:700;font-size:15px;color:var(--ink-dim);font-variant-numeric:tabular-nums;white-space:nowrap}
-  .clock b{color:var(--ink)}
+      /* ---- top bar ---- */
+      .bar {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .brand {
+        font-weight: 700;
+        font-size: 19px;
+        letter-spacing: -0.02em;
+      }
+      .brand small {
+        display: block;
+        font-weight: 500;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        margin-top: 2px;
+      }
+      .clock {
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--ink-dim);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .clock b {
+        color: var(--ink);
+      }
 
-  /* ---- next departure hero ---- */
-  .hero{
-    position:relative;background:var(--panel);border:1px solid var(--line);
-    border-radius:var(--radius);padding:18px 18px 16px;margin-bottom:14px;overflow:hidden;
-  }
-  .hero::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent,var(--student))}
-  .hero[data-svc="staff"]{--accent:var(--staff)}
-  .hero[data-svc="student"]{--accent:var(--student)}
-  .hero-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
-  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
-  .count{display:flex;align-items:baseline;gap:8px}
-  .count .big{font-family:var(--mono);font-weight:700;font-size:30px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-  .count .dep{font-family:var(--mono);font-weight:700;font-size:15px;color:var(--ink-dim)}
-  .pulse{color:var(--now);animation:blink 1.1s steps(2,start) infinite}
-  @keyframes blink{to{opacity:.25}}
-  .hero .route{margin-top:4px}
-  .empty-hero{color:var(--ink-dim);font-size:14px;padding:6px 0}
+      /* ---- next departure hero ---- */
+      .hero {
+        position: relative;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 18px 18px 16px;
+        margin-bottom: 14px;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--accent, var(--student));
+      }
+      .hero[data-svc="staff"] {
+        --accent: var(--staff);
+      }
+      .hero[data-svc="student"] {
+        --accent: var(--student);
+      }
+      .hero-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        font-weight: 600;
+      }
+      .count {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+      .count .big {
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 30px;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+      }
+      .count .dep {
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--ink-dim);
+      }
+      .pulse {
+        color: var(--now);
+        animation: blink 1.1s steps(2, start) infinite;
+      }
+      @keyframes blink {
+        to {
+          opacity: 0.25;
+        }
+      }
+      .hero .route {
+        margin-top: 4px;
+      }
+      .empty-hero {
+        color: var(--ink-dim);
+        font-size: 14px;
+        padding: 6px 0;
+      }
 
-  /* ---- controls ---- */
-  .controls{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin-bottom:16px}
-  .seg{display:flex;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:3px;gap:3px;margin-bottom:10px}
-  .seg button{
-    flex:1;border:0;background:transparent;color:var(--ink-dim);
-    font-family:var(--sans);font-weight:600;font-size:13px;padding:8px 6px;border-radius:8px;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;gap:6px;transition:.15s;
-  }
-  .seg button .dt{width:8px;height:8px;border-radius:50%}
-  .seg button[data-k="student"] .dt{background:var(--student)}
-  .seg button[data-k="staff"] .dt{background:var(--staff)}
-  .seg button.on{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.18)}
-  .od{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:end}
-  .field label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;margin:0 0 5px 2px}
-  select{
-    width:100%;appearance:none;-webkit-appearance:none;
-    background:var(--panel-2);color:var(--ink);border:1px solid var(--line);
-    border-radius:10px;padding:11px 30px 11px 11px;font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%238b95a6' stroke-width='1.6' stroke-linecap='round'/></svg>");
-    background-repeat:no-repeat;background-position:right 11px center;
-  }
-  .swap{
-    border:1px solid var(--line);background:var(--panel-2);color:var(--ink-dim);
-    width:40px;height:42px;border-radius:10px;cursor:pointer;font-size:16px;line-height:1;
-    display:flex;align-items:center;justify-content:center;transition:.15s;flex:none;
-  }
-  .swap:hover{color:var(--ink);border-color:var(--ink-faint)}
-  .row2{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:10px}
-  .viewtoggle{display:flex;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:3px;gap:3px}
-  .viewtoggle button{border:0;background:transparent;color:var(--ink-dim);font-family:var(--sans);font-weight:600;font-size:12.5px;padding:6px 16px;border-radius:7px;cursor:pointer;transition:.15s}
-  .viewtoggle button.on{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.18)}
-  .reset{border:0;background:transparent;color:var(--ink-faint);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+      /* ---- controls ---- */
+      .controls {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 12px;
+        margin-bottom: 16px;
+      }
+      .seg {
+        display: flex;
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 3px;
+        gap: 3px;
+        margin-bottom: 10px;
+      }
+      .seg button {
+        flex: 1;
+        border: 0;
+        background: transparent;
+        color: var(--ink-dim);
+        font-family: var(--sans);
+        font-weight: 600;
+        font-size: 13px;
+        padding: 8px 6px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: 0.15s;
+      }
+      .seg button .dt {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      .seg button[data-k="student"] .dt {
+        background: var(--student);
+      }
+      .seg button[data-k="staff"] .dt {
+        background: var(--staff);
+      }
+      .seg button.on {
+        background: var(--panel);
+        color: var(--ink);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+      }
+      .od {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 8px;
+        align-items: end;
+      }
+      .field label {
+        display: block;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        font-weight: 600;
+        margin: 0 0 5px 2px;
+      }
+      select {
+        width: 100%;
+        appearance: none;
+        -webkit-appearance: none;
+        background: var(--panel-2);
+        color: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 11px 30px 11px 11px;
+        font-family: var(--sans);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%238b95a6' stroke-width='1.6' stroke-linecap='round'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 11px center;
+      }
+      .swap {
+        border: 1px solid var(--line);
+        background: var(--panel-2);
+        color: var(--ink-dim);
+        width: 40px;
+        height: 42px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.15s;
+        flex: none;
+      }
+      .swap:hover {
+        color: var(--ink);
+        border-color: var(--ink-faint);
+      }
+      .row2 {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 10px;
+        gap: 10px;
+      }
+      .viewtoggle {
+        display: flex;
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 3px;
+        gap: 3px;
+      }
+      .viewtoggle button {
+        border: 0;
+        background: transparent;
+        color: var(--ink-dim);
+        font-family: var(--sans);
+        font-weight: 600;
+        font-size: 12.5px;
+        padding: 6px 16px;
+        border-radius: 7px;
+        cursor: pointer;
+        transition: 0.15s;
+      }
+      .viewtoggle button.on {
+        background: var(--panel);
+        color: var(--ink);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+      }
+      .reset {
+        border: 0;
+        background: transparent;
+        color: var(--ink-faint);
+        font-family: var(--sans);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
 
-  /* ---- subscribe card ---- */
-  .subcard{display:flex;align-items:center;justify-content:space-between;gap:12px;
-    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-    padding:13px 14px;margin-bottom:16px;flex-wrap:wrap}
-  .sub-info{display:flex;flex-direction:column;gap:2px;min-width:0}
-  .sub-title{font-weight:600;font-size:14px}
-  .sub-sub{font-size:11.5px;color:var(--ink-faint)}
-  .sub-actions{display:flex;gap:7px;align-items:center}
-  .sub-go{appearance:none;text-decoration:none;border:0;cursor:pointer;
-    background:var(--ink);color:var(--bg);font-family:var(--sans);font-weight:600;font-size:13px;
-    padding:9px 16px;border-radius:9px;white-space:nowrap}
-  .sub-copy{appearance:none;cursor:pointer;background:var(--panel-2);color:var(--ink-dim);
-    border:1px solid var(--line);font-family:var(--sans);font-weight:600;font-size:13px;
-    padding:9px 13px;border-radius:9px;white-space:nowrap;transition:.15s}
-  .sub-copy.done{color:var(--staff);border-color:var(--staff)}
+      /* ---- subscribe card ---- */
+      .subcard {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 13px 14px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+      .sub-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+      }
+      .sub-title {
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .sub-sub {
+        font-size: 11.5px;
+        color: var(--ink-faint);
+      }
+      .sub-actions {
+        display: flex;
+        gap: 7px;
+        align-items: center;
+      }
+      .sub-go {
+        appearance: none;
+        text-decoration: none;
+        border: 0;
+        cursor: pointer;
+        background: var(--ink);
+        color: var(--bg);
+        font-family: var(--sans);
+        font-weight: 600;
+        font-size: 13px;
+        padding: 9px 16px;
+        border-radius: 9px;
+        white-space: nowrap;
+      }
+      .sub-copy {
+        appearance: none;
+        cursor: pointer;
+        background: var(--panel-2);
+        color: var(--ink-dim);
+        border: 1px solid var(--line);
+        font-family: var(--sans);
+        font-weight: 600;
+        font-size: 13px;
+        padding: 9px 13px;
+        border-radius: 9px;
+        white-space: nowrap;
+        transition: 0.15s;
+      }
+      .sub-copy.done {
+        color: var(--staff);
+        border-color: var(--staff);
+      }
 
-  /* ---- list ---- */
-  .meta{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 10px;color:var(--ink-faint);font-size:12px;font-weight:500}
-  .list{display:flex;flex-direction:column;gap:9px}
-  .card{
-    position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;
-    padding:13px 14px 13px 16px;overflow:hidden;
-  }
-  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c)}
-  .card[data-svc="student"]{--c:var(--student)}
-  .card[data-svc="staff"]{--c:var(--staff)}
-  .card.next{border-color:var(--c);box-shadow:0 0 0 1px var(--c), 0 6px 22px -12px var(--c)}
-  .chead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
-  .timeblk{display:flex;align-items:baseline;gap:9px;min-width:0}
-  .time{font-family:var(--mono);font-weight:700;font-size:19px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-  .tag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:6px;white-space:nowrap}
-  .tag.student{background:var(--student-soft);color:var(--student)}
-  .tag.staff{background:var(--staff-soft);color:var(--staff)}
-  .until{font-family:var(--mono);font-weight:700;font-size:12px;color:var(--ink-dim);white-space:nowrap;font-variant-numeric:tabular-nums}
-  .until.soon{color:var(--c)}
-  .until.now{color:var(--now)}
-  .until.gone{color:var(--ink-faint)}
-  .card.gone{opacity:.5}
-  .card.gone.next{opacity:1}
-  .badge-next{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--c);border:1px solid var(--c);border-radius:6px;padding:2px 6px}
+      /* ---- list ---- */
+      .meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 2px 2px 10px;
+        color: var(--ink-faint);
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+      }
+      .card {
+        position: relative;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 13px 14px 13px 16px;
+        overflow: hidden;
+      }
+      .card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--c);
+      }
+      .card[data-svc="student"] {
+        --c: var(--student);
+      }
+      .card[data-svc="staff"] {
+        --c: var(--staff);
+      }
+      .card.next {
+        border-color: var(--c);
+        box-shadow:
+          0 0 0 1px var(--c),
+          0 6px 22px -12px var(--c);
+      }
+      .chead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 9px;
+      }
+      .timeblk {
+        display: flex;
+        align-items: baseline;
+        gap: 9px;
+        min-width: 0;
+      }
+      .time {
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 19px;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.01em;
+      }
+      .tag {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 3px 7px;
+        border-radius: 6px;
+        white-space: nowrap;
+      }
+      .tag.student {
+        background: var(--student-soft);
+        color: var(--student);
+      }
+      .tag.staff {
+        background: var(--staff-soft);
+        color: var(--staff);
+      }
+      .until {
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 12px;
+        color: var(--ink-dim);
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+      .until.soon {
+        color: var(--c);
+      }
+      .until.now {
+        color: var(--now);
+      }
+      .until.gone {
+        color: var(--ink-faint);
+      }
+      .card.gone {
+        opacity: 0.5;
+      }
+      .card.gone.next {
+        opacity: 1;
+      }
+      .badge-next {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--c);
+        border: 1px solid var(--c);
+        border-radius: 6px;
+        padding: 2px 6px;
+      }
 
-  /* route line */
-  .route{display:flex;flex-wrap:wrap;align-items:center;gap:0 2px;font-size:13px}
-  .stop{display:inline-flex;align-items:center;gap:6px;color:var(--ink-dim);font-weight:500;padding:1px 0}
-  .stop .dot{width:7px;height:7px;border-radius:50%;border:1.5px solid var(--ink-faint);flex:none}
-  .stop.hit{color:var(--ink);font-weight:600}
-  .stop.hit .dot{background:var(--c);border-color:var(--c)}
-  .arrow{color:var(--ink-faint);margin:0 5px;font-size:11px}
-  .note{margin-top:7px;font-size:11.5px;color:var(--ink-faint);font-style:italic}
+      /* route line */
+      .route {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0 2px;
+        font-size: 13px;
+      }
+      .stop {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--ink-dim);
+        font-weight: 500;
+        padding: 1px 0;
+      }
+      .stop .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        border: 1.5px solid var(--ink-faint);
+        flex: none;
+      }
+      .stop.hit {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .stop.hit .dot {
+        background: var(--c);
+        border-color: var(--c);
+      }
+      .arrow {
+        color: var(--ink-faint);
+        margin: 0 5px;
+        font-size: 11px;
+      }
+      .note {
+        margin-top: 7px;
+        font-size: 11.5px;
+        color: var(--ink-faint);
+        font-style: italic;
+      }
 
-  .empty{text-align:center;color:var(--ink-dim);padding:34px 16px;border:1px dashed var(--line);border-radius:14px;font-size:14px}
-  .foot{margin-top:22px;text-align:center;color:var(--ink-faint);font-size:11px;line-height:1.6}
-  .foot b{color:var(--ink-dim)}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <header class="bar">
-    <div class="brand">IIMK Shuttle<small>Campus bus departures</small></div>
-    <div class="clock" id="clock">--:--</div>
-  </header>
+      .empty {
+        text-align: center;
+        color: var(--ink-dim);
+        padding: 34px 16px;
+        border: 1px dashed var(--line);
+        border-radius: 14px;
+        font-size: 14px;
+      }
+      .foot {
+        margin-top: 22px;
+        text-align: center;
+        color: var(--ink-faint);
+        font-size: 11px;
+        line-height: 1.6;
+      }
+      .foot b {
+        color: var(--ink-dim);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="bar">
+        <div class="brand">
+          IIMK Shuttle<small>Campus bus departures</small>
+        </div>
+        <div class="clock" id="clock">--:--</div>
+      </header>
 
-  <section class="hero" id="hero" data-svc="student">
-    <div class="hero-top">
-      <span class="eyebrow" id="heroLabel">Next departure</span>
-      <span class="tag student" id="heroTag">Student</span>
+      <section class="hero" id="hero" data-svc="student">
+        <div class="hero-top">
+          <span class="eyebrow" id="heroLabel">Next departure</span>
+          <span class="tag student" id="heroTag">Student</span>
+        </div>
+        <div id="heroBody"></div>
+      </section>
+
+      <section class="controls">
+        <div class="seg" id="seg">
+          <button data-k="all" class="on">All</button>
+          <button data-k="student"><span class="dt"></span>Student</button>
+          <button data-k="staff"><span class="dt"></span>Staff</button>
+        </div>
+        <div class="od">
+          <div class="field">
+            <label for="from">From</label>
+            <select id="from"></select>
+          </div>
+          <button
+            class="swap"
+            id="swap"
+            title="Swap from / to"
+            aria-label="Swap from and to"
+          >
+            ⇄
+          </button>
+          <div class="field">
+            <label for="to">To</label>
+            <select id="to"></select>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="viewtoggle" id="view">
+            <button data-v="all">All</button>
+            <button data-v="next" class="on">Next</button>
+          </div>
+          <button class="reset" id="reset">Clear filters</button>
+        </div>
+      </section>
+
+      <section class="subcard">
+        <div class="sub-info">
+          <span class="sub-title">📅 Add to your calendar</span>
+          <span class="sub-sub" id="subDesc">Next 2 buses, auto-updating</span>
+        </div>
+        <div class="sub-actions">
+          <a class="sub-go" id="subGo" href="#">Subscribe</a>
+          <button class="sub-copy" id="subCopy" type="button">Copy link</button>
+        </div>
+      </section>
+
+      <div class="meta"><span id="count">—</span><span id="cycle"></span></div>
+      <div class="list" id="list"></div>
+
+      <p class="foot">
+        Student board w.e.f. <b>09 Jun 2026</b> · Staff shuttle w.e.f.
+        <b>May 2025</b>.<br />
+        Times are scheduled departures from the first stop — treat as a guide,
+        not a guarantee.
+      </p>
     </div>
-    <div id="heroBody"></div>
-  </section>
 
-  <section class="controls">
-    <div class="seg" id="seg">
-      <button data-k="all" class="on">All</button>
-      <button data-k="student"><span class="dt"></span>Student</button>
-      <button data-k="staff"><span class="dt"></span>Staff</button>
-    </div>
-    <div class="od">
-      <div class="field">
-        <label for="from">From</label>
-        <select id="from"></select>
-      </div>
-      <button class="swap" id="swap" title="Swap from / to" aria-label="Swap from and to">⇄</button>
-      <div class="field">
-        <label for="to">To</label>
-        <select id="to"></select>
-      </div>
-    </div>
-    <div class="row2">
-      <div class="viewtoggle" id="view">
-        <button data-v="all">All</button>
-        <button data-v="next" class="on">Next</button>
-      </div>
-      <button class="reset" id="reset">Clear filters</button>
-    </div>
-  </section>
+    <script>
+      /* ---------------- data ---------------- */
+      // stops are listed in travel order. note = via / direct / loop info.
+      const STUDENT = [
+        ["08:55", ["C&D Housing", "Phase V Campus", "PGP Auditorium"]],
+        ["09:05", ["PGP Auditorium", "Phase V Campus", "C&D Housing"]],
+        ["10:25", ["C&D Housing", "Phase V Campus", "PGP Auditorium"]],
+        ["10:35", ["PGP Auditorium", "Phase V Campus", "C&D Housing"]],
+        ["10:37", ["C&D Housing", "Phase V Campus", "PGP Auditorium"]],
+        [
+          "11:00",
+          ["PGP Auditorium", "Phase V Campus", "C&D Housing", "Main Gate"],
+        ],
+        [
+          "11:45",
+          ["Main Gate", "C&D Housing", "Phase V Campus", "PGP Auditorium"],
+        ],
+        ["12:05", ["PGP Auditorium", "Phase V Campus", "C&D Housing"]],
+        ["12:07", ["C&D Housing", "Phase V Campus", "PGP Auditorium"]],
+        ["13:35", ["PGP Auditorium", "Phase V Campus", "C&D Housing"]],
+        ["13:38", ["C&D Housing", "Phase V Campus", "PGP Auditorium"]],
+        [
+          "13:45",
+          ["PGP Auditorium", "Phase V Campus", "C&D Housing", "Main Gate"],
+        ],
+        [
+          "14:05",
+          ["Main Gate", "C&D Housing", "Phase V Campus", "PGP Auditorium"],
+        ],
+        ["14:15", ["PGP Auditorium", "Phase V Campus", "C&D Housing"]],
+        ["14:17", ["C&D Housing", "Phase V Campus", "PGP Auditorium"]],
+        [
+          "15:00",
+          ["PGP Auditorium", "Phase V Campus", "C&D Housing", "Main Gate"],
+        ],
+        [
+          "15:30",
+          ["Main Gate", "C&D Housing", "Phase V Campus", "PGP Auditorium"],
+        ],
+        ["15:50", ["PGP Auditorium", "Phase V Campus", "C&D Housing"]],
+        ["15:52", ["C&D Housing", "Phase V Campus", "PGP Auditorium"]],
+        [
+          "16:15",
+          ["PGP Auditorium", "Phase V Campus", "C&D Housing", "Main Gate"],
+        ],
+        [
+          "17:00",
+          ["Main Gate", "C&D Housing", "Phase V Campus", "PGP Auditorium"],
+        ],
+        ["17:20", ["PGP Auditorium", "Phase V Campus", "C&D Housing"]],
+        ["17:22", ["C&D Housing", "Phase V Campus", "PGP Auditorium"]],
+        [
+          "18:00",
+          ["PGP Auditorium", "Phase V Campus", "C&D Housing", "Main Gate"],
+        ],
+        [
+          "18:20",
+          ["Main Gate", "C&D Housing", "Phase V Campus", "PGP Auditorium"],
+        ],
+        ["18:50", ["PGP Auditorium", "Phase V Campus", "C&D Housing"]],
+        ["18:52", ["C&D Housing", "Phase V Campus", "PGP Auditorium"]],
+        [
+          "19:00",
+          ["PGP Auditorium", "Phase V Campus", "C&D Housing", "Main Gate"],
+        ],
+        [
+          "20:00",
+          ["Main Gate", "C&D Housing", "Phase V Campus", "PGP Auditorium"],
+        ],
+        ["20:10", ["PGP Auditorium", "Phase V Campus", "C&D Housing"]],
+        ["20:15", ["C&D Housing", "Phase V Campus", "PGP Auditorium"]],
+        [
+          "20:25",
+          ["PGP Auditorium", "Phase V Campus", "C&D Housing", "Main Gate"],
+        ],
+        [
+          "21:00",
+          ["Main Gate", "C&D Housing", "Phase V Campus", "PGP Auditorium"],
+        ],
+        [
+          "21:30",
+          ["PGP Auditorium", "Phase V Campus", "C&D Housing", "PGP Auditorium"],
+          "Returns to PGP",
+        ],
+        [
+          "21:50",
+          ["PGP Auditorium", "Phase V Campus", "C&D Housing", "Main Gate"],
+        ],
+        [
+          "22:20",
+          ["Main Gate", "C&D Housing", "Phase V Campus", "PGP Auditorium"],
+        ],
+        [
+          "22:40",
+          ["PGP Auditorium", "Phase V Campus", "C&D Housing", "Main Gate"],
+        ],
+        [
+          "23:00",
+          ["Main Gate", "C&D Housing", "Phase V Campus", "PGP Auditorium"],
+        ],
+        [
+          "23:20",
+          ["PGP Auditorium", "Phase V Campus", "C&D Housing", "PGP Auditorium"],
+          "Returns to PGP",
+        ],
+        [
+          "23:40",
+          ["PGP Auditorium", "Phase V Campus", "C&D Housing", "Main Gate"],
+        ],
+        [
+          "00:00",
+          ["Main Gate", "C&D Housing", "Phase V Campus", "PGP Auditorium"],
+        ],
+      ];
+      const STAFF = [
+        ["07:45", ["Main Gate", "Main Office"], "Direct"],
+        ["08:00", ["Main Office", "Phase V Apt", "Resi Hill", "Main Gate"]],
+        ["08:30", ["Main Gate", "Main Office"], "Direct"],
+        [
+          "08:42",
+          ["Main Office", "Phase V Apt", "Resi Hill", "Main Office"],
+          "Resi Hill & back",
+        ],
+        [
+          "10:15",
+          ["Main Office", "Phase V Apt", "Apt-1", "Resi Hill", "Main Office"],
+          "& back",
+        ],
+        ["10:40", ["Main Office", "Main Gate"]],
+        ["11:50", ["Main Gate", "Main Office"]],
+        [
+          "13:05",
+          ["Main Office", "Phase V Apt", "Resi Hill", "Main Gate"],
+          "Via Phase-V Apt, R-Hill",
+        ],
+        [
+          "13:50",
+          ["Main Gate", "Resi Hill", "Phase V Apt", "Main Office"],
+          "Via R-Hill, Phase-V",
+        ],
+        [
+          "14:30",
+          ["Main Office", "Apt-1", "Resi Hill", "Main Office"],
+          "& back",
+        ],
+        [
+          "15:30",
+          ["Main Office", "Phase V Apt", "Resi Hill", "Main Gate"],
+          "Via Phase-V Apt, R-Hill",
+        ],
+        [
+          "16:15",
+          ["Main Gate", "Resi Hill", "Phase V Apt", "Main Office"],
+          "Via R-Hill, Phase-V Apt",
+        ],
+        ["16:45", ["Main Office", "Main Gate"], "Direct"],
+        ["17:15", ["Main Gate", "Main Office"]],
+        [
+          "17:40",
+          ["Main Office", "Phase V Apt", "Resi Hill", "Main Gate"],
+          "Via Phase-V Apt, R-Hill",
+        ],
+        ["18:00", ["Main Gate", "Main Office"]],
+        [
+          "18:30",
+          ["Main Office", "Resi Hill", "Phase V Apt", "Main Gate"],
+          "Via R-Hill, Phase-V Apt",
+        ],
+        [
+          "19:30",
+          ["Main Gate", "Resi Hill", "Phase V Apt", "Main Office"],
+          "Via R-Hill, Phase-V Apt",
+        ],
+        [
+          "20:30",
+          ["Main Gate", "Phase V Apt", "Resi Hill", "Main Office"],
+          "Via Phase-V, R-Hill",
+        ],
+        ["21:30", ["Main Office", "Main Gate"]],
+        ["21:55", ["Main Office", "Main Gate"]],
+      ];
 
-  <section class="subcard">
-    <div class="sub-info">
-      <span class="sub-title">📅 Add to your calendar</span>
-      <span class="sub-sub" id="subDesc">Next 2 buses, auto-updating</span>
-    </div>
-    <div class="sub-actions">
-      <a class="sub-go" id="subGo" href="#">Subscribe</a>
-      <button class="sub-copy" id="subCopy" type="button">Copy link</button>
-    </div>
-  </section>
+      const TRIPS = [];
+      STUDENT.forEach(([t, s, n]) =>
+        TRIPS.push({
+          svc: "student",
+          t,
+          min: dayMin(t),
+          stops: s,
+          note: n || "",
+        }),
+      );
+      STAFF.forEach(([t, s, n]) =>
+        TRIPS.push({
+          svc: "staff",
+          t,
+          min: dayMin(t),
+          stops: s,
+          note: n || "",
+        }),
+      );
 
-  <div class="meta"><span id="count">—</span><span id="cycle"></span></div>
-  <div class="list" id="list"></div>
+      function toMin(hhmm) {
+        const [h, m] = hhmm.split(":").map(Number);
+        return h * 60 + m;
+      }
+      // midnight (00:00) belongs at the END of the service day, not the start
+      function dayMin(hhmm) {
+        const m = toMin(hhmm);
+        return m === 0 ? 1440 : m;
+      }
+      function fmt12(hhmm) {
+        let [h, m] = hhmm.split(":").map(Number);
+        const ap = h < 12 ? "AM" : "PM";
+        let hh = h % 12;
+        if (hh === 0) hh = 12;
+        return hh + ":" + String(m).padStart(2, "0") + " " + ap;
+      }
 
-  <p class="foot">
-    Student board w.e.f. <b>09 Jun 2026</b> · Staff shuttle w.e.f. <b>May 2025</b>.<br>
-    Times are scheduled departures from the first stop — treat as a guide, not a guarantee.
-  </p>
-</div>
+      /* ---------------- state ---------------- */
+      const state = { svc: "all", from: "", to: "", view: "next" };
 
-<script>
-/* ---------------- data ---------------- */
-// stops are listed in travel order. note = via / direct / loop info.
-const STUDENT = [
-  ["08:55",["C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["09:05",["PGP Auditorium","Phase V Campus","C&D Housing"]],
-  ["10:25",["C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["10:35",["PGP Auditorium","Phase V Campus","C&D Housing"]],
-  ["10:37",["C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["11:00",["PGP Auditorium","Phase V Campus","C&D Housing","Main Gate"]],
-  ["11:45",["Main Gate","C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["12:05",["PGP Auditorium","Phase V Campus","C&D Housing"]],
-  ["12:07",["C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["13:35",["PGP Auditorium","Phase V Campus","C&D Housing"]],
-  ["13:38",["C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["13:45",["PGP Auditorium","Phase V Campus","C&D Housing","Main Gate"]],
-  ["14:05",["Main Gate","C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["14:15",["PGP Auditorium","Phase V Campus","C&D Housing"]],
-  ["14:17",["C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["15:00",["PGP Auditorium","Phase V Campus","C&D Housing","Main Gate"]],
-  ["15:30",["Main Gate","C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["15:50",["PGP Auditorium","Phase V Campus","C&D Housing"]],
-  ["15:52",["C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["16:15",["PGP Auditorium","Phase V Campus","C&D Housing","Main Gate"]],
-  ["17:00",["Main Gate","C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["17:20",["PGP Auditorium","Phase V Campus","C&D Housing"]],
-  ["17:22",["C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["18:00",["PGP Auditorium","Phase V Campus","C&D Housing","Main Gate"]],
-  ["18:20",["Main Gate","C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["18:50",["PGP Auditorium","Phase V Campus","C&D Housing"]],
-  ["18:52",["C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["19:00",["PGP Auditorium","Phase V Campus","C&D Housing","Main Gate"]],
-  ["20:00",["Main Gate","C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["20:10",["PGP Auditorium","Phase V Campus","C&D Housing"]],
-  ["20:15",["C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["20:25",["PGP Auditorium","Phase V Campus","C&D Housing","Main Gate"]],
-  ["21:00",["Main Gate","C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["21:30",["PGP Auditorium","Phase V Campus","C&D Housing","PGP Auditorium"],"Returns to PGP"],
-  ["21:50",["PGP Auditorium","Phase V Campus","C&D Housing","Main Gate"]],
-  ["22:20",["Main Gate","C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["22:40",["PGP Auditorium","Phase V Campus","C&D Housing","Main Gate"]],
-  ["23:00",["Main Gate","C&D Housing","Phase V Campus","PGP Auditorium"]],
-  ["23:20",["PGP Auditorium","Phase V Campus","C&D Housing","PGP Auditorium"],"Returns to PGP"],
-  ["23:40",["PGP Auditorium","Phase V Campus","C&D Housing","Main Gate"]],
-  ["00:00",["Main Gate","C&D Housing","Phase V Campus","PGP Auditorium"]],
-];
-const STAFF = [
-  ["07:45",["Main Gate","Main Office"],"Direct"],
-  ["08:00",["Main Office","Phase V Apt","Resi Hill","Main Gate"]],
-  ["08:30",["Main Gate","Main Office"],"Direct"],
-  ["08:42",["Main Office","Phase V Apt","Resi Hill","Main Office"],"Resi Hill & back"],
-  ["10:15",["Main Office","Phase V Apt","Apt-1","Resi Hill","Main Office"],"& back"],
-  ["10:40",["Main Office","Main Gate"]],
-  ["11:50",["Main Gate","Main Office"]],
-  ["13:05",["Main Office","Phase V Apt","Resi Hill","Main Gate"],"Via Phase-V Apt, R-Hill"],
-  ["13:50",["Main Gate","Resi Hill","Phase V Apt","Main Office"],"Via R-Hill, Phase-V"],
-  ["14:30",["Main Office","Apt-1","Resi Hill","Main Office"],"& back"],
-  ["15:30",["Main Office","Phase V Apt","Resi Hill","Main Gate"],"Via Phase-V Apt, R-Hill"],
-  ["16:15",["Main Gate","Resi Hill","Phase V Apt","Main Office"],"Via R-Hill, Phase-V Apt"],
-  ["16:45",["Main Office","Main Gate"],"Direct"],
-  ["17:15",["Main Gate","Main Office"]],
-  ["17:40",["Main Office","Phase V Apt","Resi Hill","Main Gate"],"Via Phase-V Apt, R-Hill"],
-  ["18:00",["Main Gate","Main Office"]],
-  ["18:30",["Main Office","Resi Hill","Phase V Apt","Main Gate"],"Via R-Hill, Phase-V Apt"],
-  ["19:30",["Main Gate","Resi Hill","Phase V Apt","Main Office"],"Via R-Hill, Phase-V Apt"],
-  ["20:30",["Main Gate","Phase V Apt","Resi Hill","Main Office"],"Via Phase-V, R-Hill"],
-  ["21:30",["Main Office","Main Gate"]],
-  ["21:55",["Main Office","Main Gate"]],
-];
+      /* ---------------- build stop dropdowns ---------------- */
+      const allStops = [...new Set(TRIPS.flatMap((t) => t.stops))].sort();
+      function fillSelect(el, placeholder) {
+        el.innerHTML = "";
+        const o = document.createElement("option");
+        o.value = "";
+        o.textContent = placeholder;
+        el.appendChild(o);
+        allStops.forEach((s) => {
+          const op = document.createElement("option");
+          op.value = s;
+          op.textContent = s;
+          el.appendChild(op);
+        });
+      }
+      const fromEl = document.getElementById("from"),
+        toEl = document.getElementById("to");
+      fillSelect(fromEl, "Anywhere");
+      fillSelect(toEl, "Anywhere");
 
-const TRIPS = [];
-STUDENT.forEach(([t,s,n])=>TRIPS.push({svc:"student",t,min:dayMin(t),stops:s,note:n||""}));
-STAFF.forEach(([t,s,n])=>TRIPS.push({svc:"staff",t,min:dayMin(t),stops:s,note:n||""}));
+      /* ---------------- filtering ---------------- */
+      function matches(trip) {
+        if (state.svc !== "all" && trip.svc !== state.svc) return false;
+        const f = state.from,
+          d = state.to;
+        if (f) {
+          const i = trip.stops.indexOf(f);
+          if (i < 0) return false;
+          if (d) {
+            const j = trip.stops.lastIndexOf(d);
+            if (j < 0 || j <= i) return false;
+          }
+        } else if (d) {
+          if (trip.stops.indexOf(d) < 0) return false;
+        }
+        return true;
+      }
+      // minutes until departure on the linear service day; negative = already departed
+      function until(now, min) {
+        return min - now;
+      }
 
-function toMin(hhmm){const[h,m]=hhmm.split(":").map(Number);return h*60+m;}
-// midnight (00:00) belongs at the END of the service day, not the start
-function dayMin(hhmm){const m=toMin(hhmm);return m===0?1440:m;}
-function fmt12(hhmm){let[h,m]=hhmm.split(":").map(Number);const ap=h<12?"AM":"PM";let hh=h%12;if(hh===0)hh=12;return hh+":"+String(m).padStart(2,"0")+" "+ap;}
+      /* ---------------- rendering ---------------- */
+      function nowMin() {
+        const d = new Date();
+        return d.getHours() * 60 + d.getMinutes() + d.getSeconds() / 60;
+      }
 
-/* ---------------- state ---------------- */
-const state={svc:"all",from:"",to:"",view:"next"};
+      function routeHTML(trip) {
+        const f = state.from,
+          d = state.to;
+        let fi = f ? trip.stops.indexOf(f) : -1;
+        let di = d ? trip.stops.lastIndexOf(d) : -1;
+        return trip.stops
+          .map((s, idx) => {
+            const isHit = (f && idx === fi) || (d && idx === di);
+            const arrow =
+              idx < trip.stops.length - 1 ? '<span class="arrow">→</span>' : "";
+            return `<span class="stop${isHit ? " hit" : ""}"><span class="dot"></span>${s}</span>${arrow}`;
+          })
+          .join("");
+      }
 
-/* ---------------- build stop dropdowns ---------------- */
-const allStops=[...new Set(TRIPS.flatMap(t=>t.stops))].sort();
-function fillSelect(el,placeholder){
-  el.innerHTML="";
-  const o=document.createElement("option");o.value="";o.textContent=placeholder;el.appendChild(o);
-  allStops.forEach(s=>{const op=document.createElement("option");op.value=s;op.textContent=s;el.appendChild(op);});
-}
-const fromEl=document.getElementById("from"),toEl=document.getElementById("to");
-fillSelect(fromEl,"Anywhere");fillSelect(toEl,"Anywhere");
+      function untilText(delta) {
+        const m = Math.round(delta);
+        if (m < 0) return { t: "departed", cls: "gone" };
+        if (m === 0) return { t: "now", cls: "now" };
+        if (m < 60) return { t: "in " + m + "m", cls: m <= 15 ? "soon" : "" };
+        const h = Math.floor(m / 60),
+          mm = m % 60;
+        return { t: "in " + h + "h" + (mm ? " " + mm + "m" : ""), cls: "" };
+      }
 
-/* ---------------- filtering ---------------- */
-function matches(trip){
-  if(state.svc!=="all" && trip.svc!==state.svc) return false;
-  const f=state.from,d=state.to;
-  if(f){const i=trip.stops.indexOf(f); if(i<0) return false;
-    if(d){const j=trip.stops.lastIndexOf(d); if(j<0||j<=i) return false;}
-  } else if(d){
-    if(trip.stops.indexOf(d)<0) return false;
-  }
-  return true;
-}
-// minutes until departure on the linear service day; negative = already departed
-function until(now,min){return min-now;}
+      function render() {
+        updateSubscribe();
+        const now = nowMin();
+        const rows = TRIPS.filter(matches).sort((a, b) => a.min - b.min);
 
-/* ---------------- rendering ---------------- */
-function nowMin(){const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60;}
+        // next = first upcoming trip today (no wraparound)
+        const upcoming = rows.find((t) => t.min >= now) || null;
+        renderHero(upcoming, now);
 
-function routeHTML(trip){
-  const f=state.from,d=state.to;
-  let fi=f?trip.stops.indexOf(f):-1;
-  let di=d?trip.stops.lastIndexOf(d):-1;
-  return trip.stops.map((s,idx)=>{
-    const isHit=(f&&idx===fi)||(d&&idx===di);
-    const arrow=idx<trip.stops.length-1?'<span class="arrow">→</span>':'';
-    return `<span class="stop${isHit?' hit':''}"><span class="dot"></span>${s}</span>${arrow}`;
-  }).join("");
-}
+        // "Next" view: keep all upcoming + the single most recent departure
+        let shown = rows;
+        if (state.view === "next" && rows.length) {
+          const i = rows.findIndex((t) => t.min >= now);
+          if (i === -1)
+            shown = rows.slice(-1); // whole day done → just the last bus
+          else if (i <= 0)
+            shown = rows; // before first bus → show everything
+          else shown = rows.slice(i - 1); // one earlier + everything upcoming
+        }
 
-function untilText(delta){
-  const m=Math.round(delta);
-  if(m<0) return {t:"departed",cls:"gone"};
-  if(m===0) return {t:"now",cls:"now"};
-  if(m<60) return {t:"in "+m+"m",cls:m<=15?"soon":""};
-  const h=Math.floor(m/60),mm=m%60;
-  return {t:"in "+h+"h"+(mm?" "+mm+"m":""),cls:""};
-}
+        const list = document.getElementById("list");
+        document.getElementById("count").textContent =
+          shown.length + (shown.length === 1 ? " trip" : " trips");
+        document.getElementById("cycle").textContent =
+          state.view === "next" ? "upcoming + 1 earlier" : "7:45 AM – 12:00 AM";
 
-function render(){
-  updateSubscribe();
-  const now=nowMin();
-  const rows=TRIPS.filter(matches).sort((a,b)=>a.min-b.min);
+        if (!rows.length) {
+          list.innerHTML =
+            '<div class="empty">No trips match this route.<br>Try swapping From / To or clearing the filters.</div>';
+          return;
+        }
 
-  // next = first upcoming trip today (no wraparound)
-  const upcoming=rows.find(t=>t.min>=now)||null;
-  renderHero(upcoming,now);
-
-  // "Next" view: keep all upcoming + the single most recent departure
-  let shown=rows;
-  if(state.view==="next" && rows.length){
-    const i=rows.findIndex(t=>t.min>=now);
-    if(i===-1) shown=rows.slice(-1);        // whole day done → just the last bus
-    else if(i<=0) shown=rows;               // before first bus → show everything
-    else shown=rows.slice(i-1);             // one earlier + everything upcoming
-  }
-
-  const list=document.getElementById("list");
-  document.getElementById("count").textContent=shown.length+(shown.length===1?" trip":" trips");
-  document.getElementById("cycle").textContent=state.view==="next"?"upcoming + 1 earlier":"7:45 AM – 12:00 AM";
-
-  if(!rows.length){
-    list.innerHTML='<div class="empty">No trips match this route.<br>Try swapping From / To or clearing the filters.</div>';
-    return;
-  }
-
-  const nextId=upcoming?upcoming.svc+upcoming.t:null;
-  list.innerHTML=shown.map(t=>{
-    const u=untilText(until(now,t.min));
-    const isNext=(t.svc+t.t)===nextId;
-    const gone=t.min<now;
-    return `<article class="card${isNext?' next':''}${gone?' gone':''}" data-svc="${t.svc}">
+        const nextId = upcoming ? upcoming.svc + upcoming.t : null;
+        list.innerHTML = shown
+          .map((t) => {
+            const u = untilText(until(now, t.min));
+            const isNext = t.svc + t.t === nextId;
+            const gone = t.min < now;
+            return `<article class="card${isNext ? " next" : ""}${gone ? " gone" : ""}" data-svc="${t.svc}">
       <div class="chead">
         <div class="timeblk">
           <span class="time">${fmt12(t.t)}</span>
           <span class="tag ${t.svc}">${t.svc}</span>
         </div>
-        ${isNext?'<span class="badge-next">Next</span>':`<span class="until ${u.cls}">${u.t}</span>`}
+        ${isNext ? '<span class="badge-next">Next</span>' : `<span class="until ${u.cls}">${u.t}</span>`}
       </div>
       <div class="route">${routeHTML(t)}</div>
-      ${t.note?`<div class="note">${t.note}</div>`:''}
+      ${t.note ? `<div class="note">${t.note}</div>` : ""}
     </article>`;
-  }).join("");
-}
+          })
+          .join("");
+      }
 
-function renderHero(up,now){
-  const hero=document.getElementById("hero");
-  const body=document.getElementById("heroBody");
-  const tag=document.getElementById("heroTag");
-  const label=document.getElementById("heroLabel");
+      function renderHero(up, now) {
+        const hero = document.getElementById("hero");
+        const body = document.getElementById("heroBody");
+        const tag = document.getElementById("heroTag");
+        const label = document.getElementById("heroLabel");
 
-  if(!up){
-    // service over for the day — point to tomorrow's first matching bus
-    const first=TRIPS.filter(matches).sort((a,b)=>a.min-b.min)[0];
-    hero.dataset.svc=first?first.svc:"student";
-    if(first){
-      tag.style.display="";tag.className="tag "+first.svc;
-      tag.textContent=first.svc==="student"?"Student":"Staff";
-      label.textContent="Service resumes";
-      body.innerHTML=`<div class="count"><span class="big">${fmt12(first.t)}</span><span class="dep">· first bus</span></div>
-        <div class="route">${routeHTML(first)}</div>${first.note?`<div class="note">${first.note}</div>`:''}`;
-    }else{
-      tag.style.display="none";label.textContent="No departures";
-      body.innerHTML='<div class="empty-hero">Nothing scheduled for this route.</div>';
-    }
-    return;
-  }
+        if (!up) {
+          // service over for the day — point to tomorrow's first matching bus
+          const first = TRIPS.filter(matches).sort((a, b) => a.min - b.min)[0];
+          hero.dataset.svc = first ? first.svc : "student";
+          if (first) {
+            tag.style.display = "";
+            tag.className = "tag " + first.svc;
+            tag.textContent = first.svc === "student" ? "Student" : "Staff";
+            label.textContent = "Service resumes";
+            body.innerHTML = `<div class="count"><span class="big">${fmt12(first.t)}</span><span class="dep">· first bus</span></div>
+        <div class="route">${routeHTML(first)}</div>${first.note ? `<div class="note">${first.note}</div>` : ""}`;
+          } else {
+            tag.style.display = "none";
+            label.textContent = "No departures";
+            body.innerHTML =
+              '<div class="empty-hero">Nothing scheduled for this route.</div>';
+          }
+          return;
+        }
 
-  const u=untilText(until(now,up.min));
-  hero.dataset.svc=up.svc;
-  tag.style.display="";tag.className="tag "+up.svc;
-  tag.textContent=up.svc==="student"?"Student":"Staff";
-  label.textContent="Next departure";
-  const ct=u.cls==="now"?'<span class="big pulse">Now</span>'
-    :`<span class="big">${u.t.replace(/^in /,"")}</span>`;
-  body.innerHTML=`<div class="count">${ct}<span class="dep">· ${fmt12(up.t)}</span></div>
-    <div class="route">${routeHTML(up)}</div>${up.note?`<div class="note">${up.note}</div>`:''}`;
-}
+        const u = untilText(until(now, up.min));
+        hero.dataset.svc = up.svc;
+        tag.style.display = "";
+        tag.className = "tag " + up.svc;
+        tag.textContent = up.svc === "student" ? "Student" : "Staff";
+        label.textContent = "Next departure";
+        const ct =
+          u.cls === "now"
+            ? '<span class="big pulse">Now</span>'
+            : `<span class="big">${u.t.replace(/^in /, "")}</span>`;
+        body.innerHTML = `<div class="count">${ct}<span class="dep">· ${fmt12(up.t)}</span></div>
+    <div class="route">${routeHTML(up)}</div>${up.note ? `<div class="note">${up.note}</div>` : ""}`;
+      }
 
-/* ---------------- subscribe / calendar feed ---------------- */
-const ICS_PATH="/shuttle.ics"; // Cloudflare Pages Function route
-function subParams(){
-  const p=new URLSearchParams();
-  if(state.svc!=="all")p.set("svc",state.svc);
-  if(state.from)p.set("from",state.from);
-  if(state.to)p.set("to",state.to);
-  const q=p.toString();
-  return q?("?"+q):"";
-}
-function subUrls(){
-  const host=location.host||"your-domain";
-  const qs=subParams();
-  return {
-    webcal:"webcal://"+host+ICS_PATH+qs,
-    https:location.protocol+"//"+host+ICS_PATH+qs
-  };
-}
-function updateSubscribe(){
-  const {webcal}=subUrls();
-  const go=document.getElementById("subGo");
-  go.href=webcal;
-  const bits=[];
-  if(state.svc!=="all")bits.push(state.svc);
-  if(state.from)bits.push("from "+state.from);
-  if(state.to)bits.push("to "+state.to);
-  document.getElementById("subDesc").textContent=
-    "Next 2 buses, auto-updating"+(bits.length?" · "+bits.join(" · "):"");
-}
-document.getElementById("subCopy").addEventListener("click",async ()=>{
-  const {webcal}=subUrls();
-  const btn=document.getElementById("subCopy");
-  try{
-    await navigator.clipboard.writeText(webcal);
-    btn.textContent="Copied!";btn.classList.add("done");
-    setTimeout(()=>{btn.textContent="Copy link";btn.classList.remove("done");},1600);
-  }catch(e){
-    window.prompt("Copy this calendar link:",webcal);
-  }
-});
+      /* ---------------- subscribe / calendar feed ---------------- */
+      const ICS_PATH = "/shuttle.ics"; // Cloudflare Pages Function route
+      function subParams() {
+        const p = new URLSearchParams();
+        if (state.svc !== "all") p.set("svc", state.svc);
+        if (state.from) p.set("from", state.from);
+        if (state.to) p.set("to", state.to);
+        const q = p.toString();
+        return q ? "?" + q : "";
+      }
+      function subUrls() {
+        const host = location.host || "your-domain";
+        const qs = subParams();
+        return {
+          webcal: "webcal://" + host + ICS_PATH + qs,
+          https: location.protocol + "//" + host + ICS_PATH + qs,
+        };
+      }
+      function updateSubscribe() {
+        const { webcal } = subUrls();
+        const go = document.getElementById("subGo");
+        go.href = webcal;
+        const bits = [];
+        if (state.svc !== "all") bits.push(state.svc);
+        if (state.from) bits.push("from " + state.from);
+        if (state.to) bits.push("to " + state.to);
+        document.getElementById("subDesc").textContent =
+          "Next 2 buses, auto-updating" +
+          (bits.length ? " · " + bits.join(" · ") : "");
+      }
+      document.getElementById("subCopy").addEventListener("click", async () => {
+        const { webcal } = subUrls();
+        const btn = document.getElementById("subCopy");
+        try {
+          await navigator.clipboard.writeText(webcal);
+          btn.textContent = "Copied!";
+          btn.classList.add("done");
+          setTimeout(() => {
+            btn.textContent = "Copy link";
+            btn.classList.remove("done");
+          }, 1600);
+        } catch (e) {
+          window.prompt("Copy this calendar link:", webcal);
+        }
+      });
 
-/* ---------------- clock ---------------- */
-function tickClock(){
-  const d=new Date();
-  let h=d.getHours();const ap=h<12?"AM":"PM";let hh=h%12;if(hh===0)hh=12;
-  const s=`<b>${hh}:${String(d.getMinutes()).padStart(2,"0")}</b>:${String(d.getSeconds()).padStart(2,"0")} ${ap}`;
-  document.getElementById("clock").innerHTML=s;
-}
+      /* ---------------- clock ---------------- */
+      function tickClock() {
+        const d = new Date();
+        let h = d.getHours();
+        const ap = h < 12 ? "AM" : "PM";
+        let hh = h % 12;
+        if (hh === 0) hh = 12;
+        const s = `<b>${hh}:${String(d.getMinutes()).padStart(2, "0")}</b>:${String(d.getSeconds()).padStart(2, "0")} ${ap}`;
+        document.getElementById("clock").innerHTML = s;
+      }
 
-/* ---------------- events ---------------- */
-document.getElementById("seg").addEventListener("click",e=>{
-  const b=e.target.closest("button");if(!b)return;
-  state.svc=b.dataset.k;
-  [...e.currentTarget.children].forEach(x=>x.classList.toggle("on",x===b));
-  render();
-});
-document.getElementById("view").addEventListener("click",e=>{
-  const b=e.target.closest("button");if(!b)return;
-  state.view=b.dataset.v;
-  [...e.currentTarget.children].forEach(x=>x.classList.toggle("on",x===b));
-  render();
-});
-fromEl.addEventListener("change",()=>{state.from=fromEl.value;render();});
-toEl.addEventListener("change",()=>{state.to=toEl.value;render();});
-document.getElementById("swap").addEventListener("click",()=>{
-  [state.from,state.to]=[state.to,state.from];
-  fromEl.value=state.from;toEl.value=state.to;render();
-});
-document.getElementById("reset").addEventListener("click",()=>{
-  state.from="";state.to="";state.svc="all";state.view="all";
-  fromEl.value="";toEl.value="";
-  document.querySelectorAll("#seg button").forEach(x=>x.classList.toggle("on",x.dataset.k==="all"));
-  document.querySelectorAll("#view button").forEach(x=>x.classList.toggle("on",x.dataset.v==="all"));
-  render();
-});
+      /* ---------------- events ---------------- */
+      document.getElementById("seg").addEventListener("click", (e) => {
+        const b = e.target.closest("button");
+        if (!b) return;
+        state.svc = b.dataset.k;
+        [...e.currentTarget.children].forEach((x) =>
+          x.classList.toggle("on", x === b),
+        );
+        render();
+      });
+      document.getElementById("view").addEventListener("click", (e) => {
+        const b = e.target.closest("button");
+        if (!b) return;
+        state.view = b.dataset.v;
+        [...e.currentTarget.children].forEach((x) =>
+          x.classList.toggle("on", x === b),
+        );
+        render();
+      });
+      fromEl.addEventListener("change", () => {
+        state.from = fromEl.value;
+        render();
+      });
+      toEl.addEventListener("change", () => {
+        state.to = toEl.value;
+        render();
+      });
+      document.getElementById("swap").addEventListener("click", () => {
+        [state.from, state.to] = [state.to, state.from];
+        fromEl.value = state.from;
+        toEl.value = state.to;
+        render();
+      });
+      document.getElementById("reset").addEventListener("click", () => {
+        state.from = "";
+        state.to = "";
+        state.svc = "all";
+        state.view = "all";
+        fromEl.value = "";
+        toEl.value = "";
+        document
+          .querySelectorAll("#seg button")
+          .forEach((x) => x.classList.toggle("on", x.dataset.k === "all"));
+        document
+          .querySelectorAll("#view button")
+          .forEach((x) => x.classList.toggle("on", x.dataset.v === "all"));
+        render();
+      });
 
-/* ---------------- loop ---------------- */
-tickClock();render();
-setInterval(tickClock,1000);
-let lastMin=new Date().getMinutes();
-setInterval(()=>{
-  const m=new Date().getMinutes();
-  if(m!==lastMin){lastMin=m;render();}
-},1000);
-</script>
-</body>
+      /* ---------------- loop ---------------- */
+      tickClock();
+      render();
+      setInterval(tickClock, 1000);
+      let lastMin = new Date().getMinutes();
+      setInterval(() => {
+        const m = new Date().getMinutes();
+        if (m !== lastMin) {
+          lastMin = m;
+          render();
+        }
+      }, 1000);
+    </script>
+  </body>
 </html>
