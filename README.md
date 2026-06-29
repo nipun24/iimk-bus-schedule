@@ -6,28 +6,35 @@ plus a live "next 2 buses" calendar feed.
 ## Files
 
 ```
-index.html              ← the web app (self-contained, no build step)
-functions/
-  _schedule.js          ← canonical schedule data (used by the API)
-  shuttle.ics.js        ← Cloudflare Pages Function → serves /shuttle.ics
+public/
+  index.html    ← the web app (the ONLY thing served as a static asset)
+worker.js       ← Cloudflare Worker — handles /shuttle.ics, passes
+                  everything else to static assets via env.ASSETS
+wrangler.toml   ← worker + assets config (name MUST match your Worker)
 README.md
 ```
 
-## Deploy (Cloudflare Pages)
+Keeping the app in `public/` (instead of the repo root) means wrangler only
+uploads `index.html` as an asset — not `worker.js`, `node_modules`, or `.git`.
 
-1. Push this folder to a Git repo (or drag-and-drop in the Pages dashboard).
-2. Create a Pages project pointing at it.
-   - Build command: **none**
-   - Build output directory: **/** (the repo root)
-3. Cloudflare auto-detects the `functions/` folder and deploys the Function.
+## Deploy (Cloudflare Workers)
 
-After deploy:
-- App: `https://your-domain/`
-- Calendar feed: `https://your-domain/shuttle.ics`
-- Subscribe link: `webcal://your-domain/shuttle.ics`
+```bash
+npx wrangler deploy
+```
 
-> The in-app **Add to calendar** button builds this link automatically from
-> whatever filters are active.
+`wrangler.toml` must sit in the repo root and its `name` must match the Worker
+that owns your domain (here, `iimk-bus-schedule`). If the name differs, wrangler
+deploys to a *different* Worker and your domain keeps returning 404.
+
+A correct deploy log will show the Worker script uploading **and** a line like
+`Your Worker has access to the following bindings: ASSETS`. If you only see
+"Read N files from the assets directory" with no Worker/bindings line, the
+Worker script isn't deploying — check that `main = "worker.js"` is present.
+
+After deploy, test the route directly on the workers.dev URL first:
+`https://iimk-bus-schedule.<your-subdomain>.workers.dev/shuttle.ics`
+then on the custom domain: `https://iimkbus.nipunh.com/shuttle.ics`
 
 ## The calendar feed
 
@@ -69,13 +76,10 @@ So this feature is best pitched as an **Apple Calendar / iPhone** add-on.
 
 ## Keeping data in sync
 
-The schedule lives in **two** places by design:
-- `functions/_schedule.js` — used by the calendar API.
-- the `STUDENT` / `STAFF` arrays inside `index.html` — used by the static page
-  (kept inline so the page works with zero network calls).
-
-If timings change, edit **both**. They use the identical
-`["HH:MM", [stops...], "note"]` format.
+The schedule lives only in `_worker.js` (used by the calendar API) and inline
+in `index.html` (used by the static page so it works with zero network calls).
+Both use the identical `["HH:MM", [stops...], "note"]` format — edit both if
+timings change.
 
 ## Assumptions / caveats
 

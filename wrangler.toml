@@ -1,8 +1,10 @@
-name = "iimk-shuttle"
+# IMPORTANT: name must match your existing Worker (the one that owns the
+# domain iimkbus.nipunh.com). If this differs, `wrangler deploy` will push
+# your code to a *different* Worker and the domain will keep 404ing.
+name = "iimk-bus-schedule"
 main = "worker.js"
 compatibility_date = "2025-06-01"
 
 [assets]
-directory = "."
+directory = "public"
 binding = "ASSETS"
-run_worker_first = true
