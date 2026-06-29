@@ -286,7 +286,7 @@ function generateICS(request) {
     const svcLabel = tr.svc === "student" ? "Student" : "Staff";
     const first = tr.stops[0];
     const last = tr.stops[tr.stops.length - 1];
-    const summary = `IIMK BUS: ${first} → ${last}`;
+    const summary = `IIMK BUS: ${first} → ${last} (${tr.svc.toUpperCase()})`;
     let desc = `${svcLabel} shuttle\nRoute: ${tr.stops.join(" → ")}`;
     if (tr.note) desc += `\n${tr.note}`;
     desc += `\nDeparts ${first} at ${time12(tr.t)}`;
