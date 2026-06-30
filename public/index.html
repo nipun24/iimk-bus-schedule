@@ -111,6 +111,31 @@
       .clock b {
         color: var(--ink);
       }
+      .bar-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: auto;
+      }
+      .app-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel-2);
+        text-decoration: none;
+        font-size: 16px;
+        line-height: 1;
+        flex: none;
+        transition: 0.15s;
+      }
+      .app-link:hover {
+        border-color: var(--ink-faint);
+        background: var(--panel);
+      }
 
       /* ---- next departure hero ---- */
       .hero {
@@ -580,7 +605,16 @@
     <div class="wrap">
       <header class="bar">
         <div class="brand">IIMK Bus<small>Campus bus departures</small></div>
-        <div class="clock" id="clock">--:--</div>
+        <div class="bar-actions">
+          <a
+            class="app-link"
+            href="https://iimkmess.nipunh.com"
+            aria-label="Open IIMK Mess"
+            title="Open IIMK Mess"
+            >🍽️</a
+          >
+          <div class="clock" id="clock">--:--</div>
+        </div>
       </header>
 
       <section class="hero" id="hero" data-svc="student">
