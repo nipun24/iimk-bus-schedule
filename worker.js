@@ -241,7 +241,8 @@ function generateICS(request) {
   }
   occ.sort((a, b) => a.startMs - b.startMs);
   const chosen = occ.filter(
-    ({ startMs }) => startMs >= nowMs && startMs <= nowMs + WINDOW_MINUTES * 60_000,
+    ({ startMs }) =>
+      startMs >= nowMs && startMs <= nowMs + WINDOW_MINUTES * 60_000,
   );
 
   const dtstamp = fmtUtcStamp(now);
