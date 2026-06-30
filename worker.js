@@ -131,8 +131,7 @@ const STAFF = [
 // ---------------------------------------------------------------------------
 const IST_OFFSET_MIN = 330; // Asia/Kolkata = UTC+05:30, no DST ever
 const EVENT_MINUTES = 5;
-const DEFAULT_N = 2;
-const MAX_N = 5;
+const WINDOW_MINUTES = 30;
 const LOOKAHEAD_DAYS = 2; // enough to bridge the overnight gap
 
 const pad = (n) => String(n).padStart(2, "0");
@@ -208,9 +207,6 @@ function generateICS(request) {
   const svc = (url.searchParams.get("svc") || "all").toLowerCase();
   const from = url.searchParams.get("from") || "";
   const to = url.searchParams.get("to") || "";
-  let n = parseInt(url.searchParams.get("n") || String(DEFAULT_N), 10);
-  if (!Number.isFinite(n)) n = DEFAULT_N;
-  n = Math.max(1, Math.min(MAX_N, n));
 
   const trips = [
     ...STUDENT.map(([t, s, note]) => ({
@@ -244,7 +240,9 @@ function generateICS(request) {
     }
   }
   occ.sort((a, b) => a.startMs - b.startMs);
-  const chosen = occ.slice(0, n);
+  const chosen = occ.filter(
+    ({ startMs }) => startMs >= nowMs && startMs <= nowMs + WINDOW_MINUTES * 60_000,
+  );
 
   const dtstamp = fmtUtcStamp(now);
   const L = [];
