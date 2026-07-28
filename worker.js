@@ -122,7 +122,7 @@ const STAFF = [
     ["Main Office", "Resi Hill", "Phase V Apt", "Main Gate"],
     "Via R-Hill, Phase-V Apt",
   ],
-  ["21:30", ["Main Office", "Main Gate"]],
+  ["21:30", ["Main Gate", "Main Office"], "Via Phase-V, R-Hill"],
   ["21:55", ["Main Office", "Main Gate"]],
 ];
 
