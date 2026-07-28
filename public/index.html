@@ -850,7 +850,11 @@
           ["Main Office", "Resi Hill", "Phase V Apt", "Main Gate"],
           "Via R-Hill, Phase-V Apt",
         ],
-        ["21:30", ["Main Office", "Main Gate"]],
+        [
+          "21:30",
+          ["Main Gate", "Resi Hill", "Main Office"],
+          "Via Phase-V Apt, R-Hill",
+        ],
         ["21:55", ["Main Office", "Main Gate"]],
       ];
 
@@ -1006,16 +1010,16 @@
             const isNext = t.svc + t.t === nextId;
             const gone = t.min < now;
             return `<article class="card${isNext ? " next" : ""}${gone ? " gone" : ""}" data-svc="${t.svc}">
-      <div class="chead">
-        <div class="timeblk">
-          <span class="time">${fmt12(t.t)}</span>
-          <span class="tag ${t.svc}">${t.svc}</span>
+        <div class="chead">
+          <div class="timeblk">
+            <span class="time">${fmt12(t.t)}</span>
+            <span class="tag ${t.svc}">${t.svc}</span>
+          </div>
+          ${isNext ? '<span class="badge-next">Next</span>' : `<span class="until ${u.cls}">${u.t}</span>`}
         </div>
-        ${isNext ? '<span class="badge-next">Next</span>' : `<span class="until ${u.cls}">${u.t}</span>`}
-      </div>
-      <div class="route">${routeHTML(t)}</div>
-      ${t.note ? `<div class="note">${t.note}</div>` : ""}
-    </article>`;
+        <div class="route">${routeHTML(t)}</div>
+        ${t.note ? `<div class="note">${t.note}</div>` : ""}
+      </article>`;
           })
           .join("");
       }
@@ -1036,7 +1040,7 @@
             tag.textContent = first.svc === "student" ? "Student" : "Staff";
             label.textContent = "Service resumes";
             body.innerHTML = `<div class="count"><span class="big">${fmt12(first.t)}</span><span class="dep">· first bus</span></div>
-        <div class="route">${routeHTML(first)}</div>${first.note ? `<div class="note">${first.note}</div>` : ""}`;
+          <div class="route">${routeHTML(first)}</div>${first.note ? `<div class="note">${first.note}</div>` : ""}`;
           } else {
             tag.style.display = "none";
             label.textContent = "No departures";
@@ -1057,7 +1061,7 @@
             ? '<span class="big pulse">Now</span>'
             : `<span class="big">${u.t.replace(/^in /, "")}</span>`;
         body.innerHTML = `<div class="count">${ct}<span class="dep">· ${fmt12(up.t)}</span></div>
-    <div class="route">${routeHTML(up)}</div>${up.note ? `<div class="note">${up.note}</div>` : ""}`;
+      <div class="route">${routeHTML(up)}</div>${up.note ? `<div class="note">${up.note}</div>` : ""}`;
       }
 
       /* ---------------- subscribe / calendar feed ---------------- */
